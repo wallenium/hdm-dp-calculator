@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="de">
+ <head>
+  <title>Digitaldruck Rechner</title>
+  
+  <meta http-equiv="content-language" content="de" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="author" content="Hochschule der Medien" />
+	<meta name="description" content="Kalkulation für Preise der Digitaldruckmaschinen" />
+  
+  <link rel="shortcut icon" href="http://www.hdm-stuttgart.de/favicon.ico" type="image/ico" />
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.1.1.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/smoothness/jquery-ui.min.css" />
+  
+  <script type="text/javascript" src="jquery.ddcalculator.js"></script>
+  <style type="text/css">
+	#hdm_calc_wrapper{
+		width:100%;
+		font-family:Verdana, Arial, Helvetica, sans-serif;
+		font-size:80%;
+		border:1px solid #cccccc;
+		border-top:none;
+	}
+	.hdm_calc_cathead {
+		background-color:#f1f1f1;
+		padding:0 0 0.2em 0;
+		margin:0 0 0.2em 0;
+		border-left: 0.3em solid #db0031;
+		border-bottom:1px solid #cccccc;
+		height:1.7em;
+		background-image:url("http://www.hdm-stuttgart.de/stylesheets_bilder/backtab.jpg");
+		background-repeat:repeaty;
+		background-position:left bottom;
+		margin-top: 1em;
+	}
+	.hdm_calc_cathead span {
+		border-left:none;
+		font-weight:bold;
+		color:#999999;
+		margin:0;
+		float:left;
+		letter-spacing:0.1em;
+		padding: 0.2em 0.5em 0 0.5em;
+	}
+	#calc_table1, #calc_table2{
+		width:100%;
+		font-size:100%;
+	}
+	#calc_table1 th, #calc_table2 th{
+		background: #fafafa url("http://www.hdm-stuttgart.de/stylesheets_bilder/backtab.jpg") repeat-x bottom;
+		font-size: 11px;
+		height: 24px;
+		width: 14px;
+		border: 0px solid #ccc;
+		border-left: 1px solid #ccc;
+		top: 0px;
+		left: 0px;
+		margin-top: 1px;
+	}
+	.hdm_calc_wrapper{
+	  	padding: 0 0.4em  0 0.4em;
+	}
+	.xerox_table, .lfp_table{
+		font-size:100%;
+	}
+	.xerox_table td, .lfp_table td{
+		padding-left: 4px;	
+	}
+	.hdm_calc_endsumm{
+		text-align:right;
+		font-weight: bold;
+		font-size: 120%;
+		margin-right: 10px;
+	}
+	.hdm_calc_midsumm{
+		text-align:right;
+		padding-right: 8px;
+	}
+	ul.icons {
+	    margin: 0;
+	    padding: 0;
+	}
+	ul.icons li {
+	    cursor: pointer;
+	    float: right;
+	    list-style: none outside none;
+	    margin: 2px;
+	    padding: 4px 2px;
+	    position: relative;
+	}
+	.ui-icon, .ui-widget-content .ui-icon {
+	    background-image: url("http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/ui-lightness/images/ui-icons_222222_256x240.png");
+	}
+	</style>
+
+	<script type="text/javascript">
+		$(document).ready(function(){
+			
+			// fill the LFP select...
+			$('.calc_lfp').hdm_lfp_papertype();
+			
+			// Calculate prices for XEROX
+			$('.calc_xerox').live('change', function() {
+			  $(this).hdm_calc_xerox();
+			});
+			
+			// Change papertyps for rolle/sheet (LFP)
+			$('.papertype').live('change', function() {
+			  $(this).parent().parent().hdm_lfp_papertype();
+			});
+			$('.papersize').live('change', function() {
+				if($(this).val() == 2){
+			  	$(this).parent().parent().find('.hdm_calc_lm').html('m')
+				}else{
+					$(this).parent().parent().find('.hdm_calc_lm').html('')	
+				}
+			});
+
+			// Calculate prices for LFP
+			$('.calc_lfp').live('change', function() {
+			  $(this).hdm_calc_lfp();
+			});
+
+			// colorize the table
+			colorTable(".calc_xerox, .calc_lfp");
+
+			// Add and Delete Buttons
+			$(".addXeroxRow").hdm_addrow();
+			$(".addLfpRow").hdm_addrow({ add_table :	".lfp_table", calc_class:	".calc_lfp", machine: "lfp" });
+			$(".delXeroxRow").hdm_delrow();
+			$(".delLfpRow").hdm_delrow({ add_button: ".addLfpRow" });
+			
+			// the button mouseover code
+			$(".icons li").mouseenter(function(){
+				$(this).addClass("ui-state-hover");
+			}).mouseleave(function(){
+				$(this).removeClass("ui-state-hover");
+			});
+		});
+	</script>
+</head>
+<body>
+<div id="hdm_calc_wrapper">
+<div class="hdm_calc_cathead"><span>Bogendruck (XEROX DocuColor 5000)</span></div>
+	<div class="hdm_calc_wrapper">
+		<table id="calc_table1" cellspacing="0" cellpadding="0">
+			<colgroup>
+	      <col width="4%" />
+				<col width="8%" />
+				<col width="15%" />
+				<col width="18%" />
+				<col width="14%" />
+				<col width="23%" />
+				<col width="10%" />
+				<col width="8%" />
+			</colgroup>
+			<tr>
+				<th>&nbsp;</th>
+				<th>Anzahl</th>
+				<th>Format</th>
+				<th>Modus</th>
+				<th>Grammatur</th>
+				<th>&nbsp;</th>
+				<th>Summe</th>
+				<th>&nbsp;</th>
+			</tr>
+			<tr>
+				<td colspan="9">
+					<table class='xerox_table' width="100%" cellspacing="0" cellpadding="0">
+						<colgroup>
+				      <col width="4%" />
+				      <col width="8%" />
+				      <col width="15%" />
+				      <col width="18%" />
+				      <col width="14%" />
+				      <col width="23%" />
+				      <col width="10%" />
+				      <col width="8%" align="right" />
+				   </colgroup>
+						<tr class="calc_xerox">
+							<td>
+								<span class="rowNumber">1</span>
+							</td>
+							<td>
+								<input name="amount" class='amount' type="text" value="0" size="3" maxlength="6" />
+							</td>
+							<td>
+								<select name="paper" class='paper' size="1">
+									<option value="0">DIN A4</option>
+									<option value="1">DIN A3</option>
+									<option value="2">SRA3</option>
+								</select>
+							</td>
+							<td>
+								<select name="mode" class='mode' size="1">
+									<option value="0">Schwarz/Weiß</option>
+									<option value="1">Farbe</option>
+								</select>
+							</td>
+							<td>
+								<select name="weight" class='weight' size="1">
+									<option value="0">90g/qm</option>
+									<option value="1">120g/qm</option>
+									<option value="2">160g/qm</option>
+									<option value="3">200g/qm</option>
+									<option value="4">280g/qm</option>
+								</select>
+							</td>
+							<td><input type="checkbox" class="duplex" name="duplex" value="1" /> Doppelseitig</td>
+							<td class="hdm_calc_midsumm"><span class="summe">0.00</span> &#8364;</td>
+							<td class="hdm_calc_buttons">
+								<ul class="icons ui-widget ui-helper-clearfix">
+									<li class="addXeroxRow ui-state-default ui-corner-all"><span class="ui-icon ui-icon-circle-plus"></span></li>
+									<li class="delXeroxRow ui-state-default ui-corner-all"><span class="ui-icon ui-icon-circle-close"></span></li>
+								</ul>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div class="hdm_calc_cathead"><span>Großformatdruck (LFP)</span></div>
+	<div class="hdm_calc_wrapper">
+	<table id="calc_table2" cellspacing="0" cellpadding="0">
+			<colgroup>
+	      <col width="4%" />
+				<col width="10%" />
+				<col width="16%" />
+				<col width="20%" />
+				<col width="32%" />
+				<col width="10%" />
+				<col width="8%" align="right" />
+			</colgroup>
+			<tr>
+				<th>&nbsp;</th>
+				<th>Anzahl</th>
+				<th>Modus</th>
+				<th>Format</th>
+				<th>Papierart</th>
+				<th>Summe</th>
+				<th>&nbsp;</th>
+			</tr>
+			<tr>
+				<td colspan="7">
+		<table class='lfp_table' width="100%" cellspacing="0" cellpadding="0">
+						<colgroup>
+				      <col width="4%" />
+				      <col width="10%" />
+				      <col width="16%" />
+				      <col width="20%" />
+				      <col width="32%" />
+				      <col width="10%" />
+				      <col width="8%" align="right" />
+				   </colgroup>
+						<tr class="calc_lfp">
+							<td>
+								<span class="rowNumber">1</span>
+							</td>
+							<td>
+								<input name="plength" class='plength' type="text" value="0" size="5" maxlength="6" /> <span class="hdm_calc_lm"></span>
+							</td>
+							<td>
+								<select name="papertype" class='papertype' size="1">
+									<option value="0">Rolle</option>
+									<option value="1">Bogenware</option>
+								</select>
+							</td>
+							<td>
+								<select name="papersize" class='papersize' size="1">
+									<option value="0">DIN A1</option>
+									<option value="1">DIN A2</option>
+									<option value="2">DIN A3</option>
+									<option value="3">DIN A4</option>
+									<option value="4" selected="selected">laufende Meter</option>
+								</select>
+							</td>
+							<td>
+								
+								<select name="papersort" class='papersort' size="1">
+									<option value="0">matt gestrichen</option>
+									<option value="1">glänzend</option>
+									<option value="2">natur</option>
+								</select>
+							</td>
+							<td class="hdm_calc_midsumm"><span class="summe">0.00</span> &#8364;</td>
+							<td class="hdm_calc_buttons">
+								<ul class="icons ui-widget ui-helper-clearfix">
+									<li class="addLfpRow ui-state-default ui-corner-all"><span class="ui-icon ui-icon-circle-plus"></span></li>
+									<li class="delLfpRow ui-state-default ui-corner-all"><span class="ui-icon ui-icon-circle-close"></span></li>
+								</ul>
+							</td>
+						</tr>	
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<div class="hdm_calc_cathead"><span>Endsumme</span></div>
+	<div class="hdm_calc_wrapper hdm_calc_endsumm">
+		<span id="hdm_calc_gsumm">0.00</span> &#8364;
+	</div>
+</div>
+</body>
+</html>
